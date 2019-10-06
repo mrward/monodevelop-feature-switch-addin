@@ -1,0 +1,17 @@
+﻿<ExtensionModel>
+	<Runtime>
+		<Import assembly="MonoDevelop.FeatureSwitch.dll" />
+	</Runtime>
+	
+	<Extension path="/MonoDevelop/Ide/GlobalOptionsDialog/Preferences">
+		<Section
+			id="FeatureSwitch"
+			_label="Feature Switch"
+			fill="true"
+			class="MonoDevelop.FeatureSwitch.FeatureSwitchOptionsPanel" />
+	</Extension>
+
+	<Extension path="/MonoDevelop/Core/FeatureConfiguration/FeatureSwitchChecks">
+		<Type class="MonoDevelop.FeatureSwitch.FeatureSwitchController" />
+	</Extension>
+</ExtensionModel>
