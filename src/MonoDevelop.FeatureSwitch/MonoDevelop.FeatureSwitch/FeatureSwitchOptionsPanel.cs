@@ -42,6 +42,8 @@ namespace MonoDevelop.FeatureSwitch
 				FeatureSwitch feature = featuresListStore.GetValue (row, featureDataField);
 				feature.Enabled = GetFeatureEnabledFromIndex (index);
 			}
+
+			FeatureSwitchConfigurations.OnFeaturesChanged ();
 		}
 
 		bool? GetFeatureEnabledFromIndex (int index)

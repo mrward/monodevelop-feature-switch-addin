@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using MonoDevelop.Core;
 
 namespace MonoDevelop.FeatureSwitch
@@ -38,10 +39,23 @@ namespace MonoDevelop.FeatureSwitch
 		static readonly Dictionary<string, FeatureSwitch> features =
 			new Dictionary<string, FeatureSwitch> (StringComparer.OrdinalIgnoreCase);
 
+		const string MD_FEATURES_ENABLED = nameof (MD_FEATURES_ENABLED);
+		const string MD_FEATURES_DISABLED = nameof (MD_FEATURES_DISABLED);
+
+		static string originalFeaturesEnabledEnvironmentValue;
+		static string originalFeaturesDisabledEnvironmentValue;
+		static string currentFeaturesEnabledEnvironmentValue;
+
 		static FeatureSwitchConfigurations ()
 		{
-			configurations = ConfigurationProperty.Create<FeatureSwitchConfigurationProperty> (
-				"MonoDevelop.FeatureSwitchAddin.Configuration", new FeatureSwitchConfigurationProperty ()
+			originalFeaturesEnabledEnvironmentValue = Environment.GetEnvironmentVariable (MD_FEATURES_ENABLED);
+			currentFeaturesEnabledEnvironmentValue = originalFeaturesDisabledEnvironmentValue;
+
+			originalFeaturesDisabledEnvironmentValue = Environment.GetEnvironmentVariable (MD_FEATURES_DISABLED);
+
+			configurations = ConfigurationProperty.Create (
+				"MonoDevelop.FeatureSwitchAddin.Configuration",
+				new FeatureSwitchConfigurationProperty ()
 			);
 			featureSwitchConfiguration = configurations.Value;
 		}
@@ -68,7 +82,51 @@ namespace MonoDevelop.FeatureSwitch
 		public static void AddFeature (string name, bool? enabled)
 		{
 			lock (features) {
-				features [name] = new FeatureSwitch (name, enabled);
+				features [name] = new FeatureSwitch (name, enabled, enabled);
+			}
+		}
+
+		public static void AddSavedFeature (string name, bool? enabled)
+		{
+			lock (features) {
+				bool? originallyEnabled = FeatureSwitchController.IsFeatureEnabledIgnoringConfiguration (name);
+				var feature = new FeatureSwitch (name, enabled, originallyEnabled);
+				features [name] = feature;
+
+				if (feature.NeedsForceEnable) {
+					ForceEnableFeatures ();
+				}
+			}
+		}
+
+		static void ForceEnableFeatures ()
+		{
+			StringBuilder builder = null;
+			foreach (FeatureSwitch feature in features.Values) {
+				if (feature.NeedsForceEnable) {
+					if (builder == null) {
+						builder = StringBuilderCache.Allocate (originalFeaturesEnabledEnvironmentValue);
+					}
+					if (builder.Length > 0) {
+						builder.Append (';');
+					}
+					builder.Append (feature.Name);
+				}
+			}
+
+			if (builder != null) {
+				currentFeaturesEnabledEnvironmentValue = StringBuilderCache.ReturnAndFree (builder);
+				Environment.SetEnvironmentVariable (MD_FEATURES_ENABLED, currentFeaturesEnabledEnvironmentValue);
+			} else if (currentFeaturesEnabledEnvironmentValue != originalFeaturesDisabledEnvironmentValue) {
+				currentFeaturesEnabledEnvironmentValue = originalFeaturesDisabledEnvironmentValue;
+				Environment.SetEnvironmentVariable (MD_FEATURES_ENABLED, currentFeaturesEnabledEnvironmentValue);
+			}
+		}
+
+		internal static void OnFeaturesChanged ()
+		{
+			lock (features) {
+				ForceEnableFeatures ();
 			}
 		}
 	}

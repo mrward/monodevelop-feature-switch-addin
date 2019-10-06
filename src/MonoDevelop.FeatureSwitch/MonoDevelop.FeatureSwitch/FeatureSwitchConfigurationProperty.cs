@@ -37,7 +37,7 @@ namespace MonoDevelop.FeatureSwitch
 				if (reader.NodeType == XmlNodeType.Element && reader.Name == "Feature") {
 					string name = reader.GetAttribute ("name");
 					bool? enabled = GetFeatureEnabled (name, reader.GetAttribute ("enabled"));
-					FeatureSwitchConfigurations.AddFeature (name, enabled);
+					FeatureSwitchConfigurations.AddSavedFeature (name, enabled);
 				}
 			}
 			return null;

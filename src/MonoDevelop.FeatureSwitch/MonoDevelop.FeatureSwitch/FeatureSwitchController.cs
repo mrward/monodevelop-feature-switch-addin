@@ -30,7 +30,7 @@ namespace MonoDevelop.FeatureSwitch
 {
 	class FeatureSwitchController : IFeatureSwitchController
 	{
-		bool bypass;
+		static bool bypass;
 
 		public bool? IsFeatureEnabled (string featureName)
 		{
@@ -42,16 +42,20 @@ namespace MonoDevelop.FeatureSwitch
 				return feature.Enabled;
 			}
 
+			bool? enabled = IsFeatureEnabledIgnoringConfiguration (featureName);
+			FeatureSwitchConfigurations.AddFeature (featureName, enabled);
+
+			return null;
+		}
+
+		internal static bool? IsFeatureEnabledIgnoringConfiguration (string featureName)
+		{
 			try {
 				bypass = true;
-
-				bool? enabled = FeatureSwitchService.IsFeatureEnabled (featureName);
-				FeatureSwitchConfigurations.AddFeature (featureName, enabled);
+				return FeatureSwitchService.IsFeatureEnabled (featureName);
 			} finally {
 				bypass = false;
 			}
-
-			return null;
 		}
 	}
 }
