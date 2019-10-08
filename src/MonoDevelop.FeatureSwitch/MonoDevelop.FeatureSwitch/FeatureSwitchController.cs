@@ -38,12 +38,10 @@ namespace MonoDevelop.FeatureSwitch
 				return null;
 
 			FeatureSwitch feature = FeatureSwitchConfigurations.GetFeature (featureName);
-			if (feature != null) {
-				return feature.Enabled;
+			if (feature == null) {
+				bool? enabled = IsFeatureEnabledIgnoringConfiguration (featureName);
+				FeatureSwitchConfigurations.AddFeature (featureName, enabled);
 			}
-
-			bool? enabled = IsFeatureEnabledIgnoringConfiguration (featureName);
-			FeatureSwitchConfigurations.AddFeature (featureName, enabled);
 
 			return null;
 		}

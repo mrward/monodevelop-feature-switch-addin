@@ -36,25 +36,22 @@ namespace MonoDevelop.FeatureSwitch
 			while (reader.Read ()) {
 				if (reader.NodeType == XmlNodeType.Element && reader.Name == "Feature") {
 					string name = reader.GetAttribute ("name");
-					bool? enabled = GetFeatureEnabled (name, reader.GetAttribute ("enabled"));
+					bool enabled = GetFeatureEnabled (name, reader.GetAttribute ("enabled"));
 					FeatureSwitchConfigurations.AddSavedFeature (name, enabled);
 				}
 			}
+			FeatureSwitchConfigurations.OnFeaturesChanged ();
 			return null;
 		}
 
-		static bool? GetFeatureEnabled (string name, string text)
+		static bool GetFeatureEnabled (string name, string text)
 		{
-			if (string.IsNullOrEmpty (text)) {
-				return null;
-			}
-
 			if (bool.TryParse (text, out bool result)) {
 				return result;
 			}
 
 			LoggingService.LogError ("Unable to read feature enabled configuration: name={0}, enabled={1}", name, text);
-			return null;
+			return false;
 		}
 
 		public void WriteTo (XmlWriter writer)
@@ -62,17 +59,8 @@ namespace MonoDevelop.FeatureSwitch
 			foreach (FeatureSwitch feature in FeatureSwitchConfigurations.GetFeatures ()) {
 				writer.WriteStartElement ("Feature");
 				writer.WriteAttributeString ("name", feature.Name);
-				writer.WriteAttributeString ("enabled", GetFeatureEnabledText (feature));
+				writer.WriteAttributeString ("enabled", feature.Enabled.ToString ());
 			}
-		}
-
-		static string GetFeatureEnabledText (FeatureSwitch feature)
-		{
-			if (feature.Enabled == null) {
-				return string.Empty;
-			}
-
-			return feature.Enabled.Value.ToString ();
 		}
 	}
 }

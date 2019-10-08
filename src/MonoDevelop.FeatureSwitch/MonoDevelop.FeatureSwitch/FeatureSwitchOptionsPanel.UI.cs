@@ -44,7 +44,7 @@ namespace MonoDevelop.FeatureSwitch
 		ListView featuresListView;
 		ListStore featuresListStore;
 		DataField<string> featureNameDataField = new DataField<string> ();
-		DataField<int> featureEnabledIndexDataField = new DataField<int> ();
+		DataField<bool> featureEnabledDataField = new DataField<bool> ();
 		DataField<FeatureSwitch> featureDataField = new DataField<FeatureSwitch> ();
 		bool changed;
 
@@ -53,7 +53,7 @@ namespace MonoDevelop.FeatureSwitch
 			var vbox = new VBox ();
 			vbox.Spacing = 6;
 
-			featuresListStore = new ListStore (featureNameDataField, featureEnabledIndexDataField, featureDataField);
+			featuresListStore = new ListStore (featureNameDataField, featureEnabledDataField, featureDataField);
 			featuresListView = new ListView ();
 			featuresListView.DataSource = featuresListStore;
 
@@ -63,14 +63,11 @@ namespace MonoDevelop.FeatureSwitch
 			featuresListView.Columns.Add (column);
 
 			var featuresComboBoxDataSource = new List<string> ();
-			var comboBoxCellView = new ComboBoxCellView ();
-			comboBoxCellView.SelectedIndexField = featureEnabledIndexDataField;
-			comboBoxCellView.Editable = true;
-			comboBoxCellView.Items.Add (GettextCatalog.GetString ("Unspecified"));
-			comboBoxCellView.Items.Add (GettextCatalog.GetString ("Enabled"));
-			comboBoxCellView.Items.Add (GettextCatalog.GetString ("Disabled"));
-			comboBoxCellView.SelectionChanged += FeatureEnabledComboBoxSelectionChanged;
-			column = new ListViewColumn ("Enabled", comboBoxCellView);
+			var checkBoxCellView = new CheckBoxCellView ();
+			checkBoxCellView.Editable = true;
+			checkBoxCellView.ActiveField = featureEnabledDataField;
+			checkBoxCellView.Toggled += FeatureEnabledCheckBoxToggled;
+			column = new ListViewColumn ("Enabled", checkBoxCellView);
 			featuresListView.Columns.Add (column);
 
 			vbox.PackStart (featuresListView, true, true);
@@ -95,7 +92,7 @@ namespace MonoDevelop.FeatureSwitch
 			return widget;
 		}
 
-		void FeatureEnabledComboBoxSelectionChanged (object sender, WidgetEventArgs e)
+		void FeatureEnabledCheckBoxToggled (object sender, WidgetEventArgs e)
 		{
 			changed = true;
 		}
@@ -109,30 +106,23 @@ namespace MonoDevelop.FeatureSwitch
 					row,
 					featureNameDataField,
 					feature.Name,
-					featureEnabledIndexDataField,
-					GetFeatureEnabledIndex (feature),
+					featureEnabledDataField,
+					feature.Enabled,
 					featureDataField,
 					feature);
 			}
 		}
 
-		static int GetFeatureEnabledIndex (FeatureSwitch feature)
-		{
-			if (feature.Enabled is null) {
-				return UnspecifiedIndex;
-			}
-
-			if (feature.Enabled.Value) {
-				return EnabledIndex;
-			}
-
-			return DisabledIndex;
-		}
-
 		void RestartButtonClicked (object sender, EventArgs e)
 		{
+			ApplyChanges ();
+			PropertyService.SaveProperties ();
+
 			IdeApp.Restart (true).Ignore ();
-			(widget?.Toplevel as Gtk.Dialog)?.Respond (Gtk.ResponseType.Ok);
+
+			// The following does not work. The dialog is always null.
+			var dialog = (widget?.Toplevel as Gtk.Dialog);
+			dialog?.Respond (Gtk.ResponseType.Ok);
 		}
 	}
 }

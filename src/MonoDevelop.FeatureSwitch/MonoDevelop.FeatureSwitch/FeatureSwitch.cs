@@ -30,24 +30,14 @@ namespace MonoDevelop.FeatureSwitch
 {
 	class FeatureSwitch : IComparable<FeatureSwitch>
 	{
-		public FeatureSwitch (string name, bool? enabled, bool? originallyEnabled)
+		public FeatureSwitch (string name, bool enabled)
 		{
-			Name = name ?? string.Empty;
+			Name = name;
 			Enabled = enabled;
-			OriginallyEnabled = originallyEnabled;
 		}
 
 		public string Name { get; }
-		public bool? Enabled { get; set; }
-		public bool? OriginallyEnabled { get; }
-
-		/// <summary>
-		/// If the feature was disabled originally then we need to force enable it
-		/// since it will be disabled if any IFeatureSwitchController disables it.
-		/// </summary>
-		public bool NeedsForceEnable =>
-			Enabled == true &&
-			OriginallyEnabled == false;
+		public bool Enabled { get; set; }
 
 		public int CompareTo (FeatureSwitch other)
 		{

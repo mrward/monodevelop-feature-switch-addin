@@ -24,7 +24,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using MonoDevelop.Ide.Gui.Dialogs;
 
 namespace MonoDevelop.FeatureSwitch
@@ -37,27 +36,12 @@ namespace MonoDevelop.FeatureSwitch
 				return;
 
 			for (int row = 0; row < featuresListStore.RowCount; ++row) {
-				int index = featuresListStore.GetValue (row, featureEnabledIndexDataField);
-
+				bool enabled = featuresListStore.GetValue (row, featureEnabledDataField);
 				FeatureSwitch feature = featuresListStore.GetValue (row, featureDataField);
-				feature.Enabled = GetFeatureEnabledFromIndex (index);
+				feature.Enabled = enabled;
 			}
 
 			FeatureSwitchConfigurations.OnFeaturesChanged ();
-		}
-
-		bool? GetFeatureEnabledFromIndex (int index)
-		{
-			switch (index) {
-				case UnspecifiedIndex:
-					return null;
-				case EnabledIndex:
-					return true;
-				case DisabledIndex:
-					return false;
-				default:
-					throw new InvalidOperationException (string.Format ("Unknown index for feature {0}", index));
-			}
 		}
 	}
 }
