@@ -60,6 +60,7 @@ namespace MonoDevelop.FeatureSwitch
 				writer.WriteStartElement ("Feature");
 				writer.WriteAttributeString ("name", feature.Name);
 				writer.WriteAttributeString ("enabled", feature.Enabled.ToString ());
+				writer.WriteEndElement ();
 			}
 		}
 	}
