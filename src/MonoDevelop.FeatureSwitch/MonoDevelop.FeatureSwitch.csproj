@@ -45,7 +45,6 @@
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchController.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitch.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchConfigurations.cs" />
-    <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchConfigurationProperty.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchEnvironmentVariables.cs" />
   </ItemGroup>
   <ItemGroup>

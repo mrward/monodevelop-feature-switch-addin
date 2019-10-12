@@ -116,7 +116,6 @@ namespace MonoDevelop.FeatureSwitch
 		void RestartButtonClicked (object sender, EventArgs e)
 		{
 			ApplyChanges ();
-			PropertyService.SaveProperties ();
 
 			IdeApp.Restart (true).Ignore ();
 

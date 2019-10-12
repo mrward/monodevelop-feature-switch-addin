@@ -27,15 +27,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using MonoDevelop.Core;
 
 namespace MonoDevelop.FeatureSwitch
 {
 	static class FeatureSwitchConfigurations
 	{
-		static readonly FeatureSwitchConfigurationProperty featureSwitchConfiguration;
-		static readonly ConfigurationProperty<FeatureSwitchConfigurationProperty> configurations;
+		static readonly Properties properties;
+		static readonly ConfigurationProperty<Properties> configurations;
 		static readonly Dictionary<string, FeatureSwitch> features =
 			new Dictionary<string, FeatureSwitch> (StringComparer.OrdinalIgnoreCase);
 
@@ -45,9 +44,13 @@ namespace MonoDevelop.FeatureSwitch
 
 			configurations = ConfigurationProperty.Create (
 				"MonoDevelop.FeatureSwitchAddin.Configuration",
-				new FeatureSwitchConfigurationProperty ()
+				new Properties ()
 			);
-			featureSwitchConfiguration = configurations.Value;
+
+			properties = configurations.Value;
+
+			PopulateFeaturesFromProperties ();
+			OnFeaturesChanged (false);
 		}
 
 		public static IEnumerable<FeatureSwitch> GetFeatures ()
@@ -97,14 +100,40 @@ namespace MonoDevelop.FeatureSwitch
 			}
 		}
 
-		internal static void OnFeaturesChanged ()
+		internal static void OnFeaturesChanged (bool updateProperties = true)
 		{
 			try {
 				lock (features) {
+					if (updateProperties) {
+						UpdateProperties ();
+					}
 					FeatureSwitchEnvironmentVariables.Update (features.Values);
 				}
 			} catch (Exception ex) {
 				LoggingService.LogError ("Unable to update environment variables", ex);
+			}
+		}
+
+		/// <summary>
+		/// Use bool? instead of bool to ensure that properties are always saved.
+		/// We want to store all the features available as they are used so we
+		/// always want them to be saved. Using a bool would cause a property not
+		/// to be saved if the feature was disabled.
+		/// </summary>
+		static void PopulateFeaturesFromProperties ()
+		{
+			foreach (string name in properties.Keys) {
+				bool? enabled = properties.Get<bool?> (name, null);
+				AddSavedFeature (name, enabled.GetValueOrDefault ());
+			}
+		}
+
+		static void UpdateProperties ()
+		{
+			lock (features) {
+				foreach (FeatureSwitch feature in features.Values) {
+					properties.Set (feature.Name, feature.Enabled);
+				}
 			}
 		}
 	}
