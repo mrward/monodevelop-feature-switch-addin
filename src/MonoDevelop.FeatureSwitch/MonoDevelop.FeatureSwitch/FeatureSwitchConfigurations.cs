@@ -40,17 +40,25 @@ namespace MonoDevelop.FeatureSwitch
 
 		static FeatureSwitchConfigurations ()
 		{
-			ReadFeatureEnvironmentVariables ();
-
 			configurations = ConfigurationProperty.Create (
 				"MonoDevelop.FeatureSwitchAddin.Configuration",
 				new Properties ()
 			);
 
 			properties = configurations.Value;
+		}
 
-			PopulateFeaturesFromProperties ();
-			OnFeaturesChanged (false);
+		public static void Initialize ()
+		{
+			try {
+				ReadFeatureEnvironmentVariables ();
+
+				PopulateFeaturesFromFeatureSwitchService ();
+				PopulateFeaturesFromProperties ();
+				OnFeaturesChanged (false);
+			} catch (Exception ex) {
+				LoggingService.LogError ("Unable to initialize FeatureSwitchConfigurations", ex);
+			}
 		}
 
 		public static IEnumerable<FeatureSwitch> GetFeatures ()
@@ -111,6 +119,15 @@ namespace MonoDevelop.FeatureSwitch
 				}
 			} catch (Exception ex) {
 				LoggingService.LogError ("Unable to update environment variables", ex);
+			}
+		}
+
+		static void PopulateFeaturesFromFeatureSwitchService ()
+		{
+			lock (features) {
+				foreach (FeatureSwitch feature in FeatureSwitchServiceExtensions.DescribeFeatures ()) {
+					features [feature.Name] = feature;
+				}
 			}
 		}
 

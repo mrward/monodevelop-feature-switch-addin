@@ -24,10 +24,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using MonoDevelop.Core.FeatureConfiguration;
 
 namespace MonoDevelop.FeatureSwitch
 {
+	[Obsolete]
 	class FeatureSwitchController : IFeatureSwitchController
 	{
 		static bool bypass;

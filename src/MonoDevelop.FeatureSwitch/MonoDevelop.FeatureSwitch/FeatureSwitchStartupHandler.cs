@@ -1,10 +1,10 @@
 ﻿//
-// AddinInfo.cs
+// FeatureSwitchStartupHandler.cs
 //
 // Author:
 //       Matt Ward <matt.ward@microsoft.com>
 //
-// Copyright (c) 2018 Microsoft
+// Copyright (c) 2020 Microsoft Corporation
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using Mono.Addins;
 
-[assembly: Addin (
-	"FeatureSwitch",
-	Namespace = "MonoDevelop",
-	Version = "0.1",
-	Category = "IDE extensions")]
+using MonoDevelop.Components.Commands;
 
-[assembly: AddinName ("Feature Switch")]
-[assembly: AddinDescription ("Allows features to be enabled/disabled in the IDE")]
-
-[assembly: AddinDependency ("Core", "8.5")]
-[assembly: AddinDependency ("Ide", "8.5")]
-
-// Depend on Xamarin.Ide since this defines the global feature switch controller.
-// This allows us to define it after the global one and change the behaviour in
-// the IDE.
-[assembly: AddinDependency ("Xamarin.Ide", "8.5")]
+namespace MonoDevelop.FeatureSwitch
+{
+	class FeatureSwitchStartupHandler : CommandHandler
+	{
+		protected override void Run ()
+		{
+			FeatureSwitchConfigurations.Initialize ();
+		}
+	}
+}
