@@ -24,104 +24,251 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using AppKit;
 using System;
 using System.Collections.Generic;
-using MonoDevelop.Components;
+using CoreGraphics;
 using MonoDevelop.Core;
-using MonoDevelop.Ide;
-using Xwt;
+using ObjCRuntime;
+using Foundation;
 
 namespace MonoDevelop.FeatureSwitch
 {
-	partial class FeatureSwitchOptionsPanel
-	{
-		const int UnspecifiedIndex = 0;
-		const int EnabledIndex = 1;
-		const int DisabledIndex = 2;
+    interface IFeatureSwitchData
+    {
+        List<FeatureSwitch> Data { get; }
+    }
 
-		Button restartButton;
-		Gtk.Widget widget;
-		ListView featuresListView;
-		ListStore featuresListStore;
-		DataField<string> featureNameDataField = new DataField<string> ();
-		DataField<bool> featureEnabledDataField = new DataField<bool> ();
-		DataField<FeatureSwitch> featureDataField = new DataField<FeatureSwitch> ();
-		bool changed;
+    public class NSLabel : NSTextField
+    {
+        public NSLabel(string value = null)
+        {
+            Editable = false;
+            Bordered = false;
+            Bezeled = false;
+            DrawsBackground = false;
+            Selectable = false;
+            TranslatesAutoresizingMaskIntoConstraints = false;
 
-		public override Control CreatePanelWidget ()
-		{
-			var vbox = new VBox ();
-			vbox.Spacing = 6;
+            if (!string.IsNullOrEmpty(value))
+            {
+                StringValue = value;
+            }
+        }
+    }
 
-			featuresListStore = new ListStore (featureNameDataField, featureEnabledDataField, featureDataField);
-			featuresListView = new ListView ();
-			featuresListView.DataSource = featuresListStore;
+    class FeatureSwitchTableView : NSTableView
+    {
+        public override bool IsFlipped => true;
 
-			var cellView = new TextCellView ();
-			cellView.TextField = featureNameDataField;
-			var column = new ListViewColumn ("Feature", cellView);
-			featuresListView.Columns.Add (column);
+        public FeatureSwitchTableView(IFeatureSwitchData source)
+        {
+            HeaderView = null;
+            
+            BackgroundColor = NSColor.Clear;
 
-			var featuresComboBoxDataSource = new List<string> ();
-			var checkBoxCellView = new CheckBoxCellView ();
-			checkBoxCellView.Editable = true;
-			checkBoxCellView.ActiveField = featureEnabledDataField;
-			checkBoxCellView.Toggled += FeatureEnabledCheckBoxToggled;
-			column = new ListViewColumn ("Enabled", checkBoxCellView);
-			featuresListView.Columns.Add (column);
+            var column = new NSTableColumn(PackageSourcesDelegate.nameColumn) { Title = GettextCatalog.GetString("Feature") };
+            column.MinWidth = 300;
+            AddColumn(column);
 
-			vbox.PackStart (featuresListView, true, true);
+            AddColumn(new NSTableColumn(PackageSourcesDelegate.valueColumn) { Title = GettextCatalog.GetString("Enabled") });
 
-			var restartLabel = new Label ();
-			restartLabel.Text = GettextCatalog.GetString ("Some features may require a restart of {0}", BrandingService.ApplicationName);
-			restartLabel.TextAlignment = Alignment.Start;
-			vbox.PackStart (restartLabel);
+            DataSource = new PackageSourcesDataSource(source);
+            Delegate = new PackageSourcesDelegate();
+        }
 
-			var restartButtonHBox = new HBox ();
-			vbox.PackStart (restartButtonHBox, false, false);
+        FeatureSwitch DataForRow(int row)
+        {
+            return ((PackageSourcesDataSource)DataSource).DataForRow(row);
+        }
 
-			restartButton = new Button ();
-			restartButton.Label = GettextCatalog.GetString ("Restart {0}", BrandingService.ApplicationName);
-			restartButtonHBox.PackStart (restartButton, false, false);
+        class DataCheckBox : NSButton
+        {
+            FeatureSwitch model;
 
-			restartButton.Clicked += RestartButtonClicked;
+            public DataCheckBox ()
+            {
+                SetButtonType(AppKit.NSButtonType.Switch);
+                TranslatesAutoresizingMaskIntoConstraints = false;
+                Title = string.Empty;
+                Activated += DataCheckBox_Activated;
+            }
 
-			AddFeatures ();
+            private void DataCheckBox_Activated(object sender, EventArgs e)
+            {
+                if (this.model != null)
+                {
+                    this.model.Enabled = State == NSCellStateValue.On;
+                }
+            }
 
-			widget = vbox.ToGtkWidget ();
-			return widget;
-		}
+            public void SetModel(FeatureSwitch model)
+            {
+                this.model = model;
+                this.State = model.Enabled ? NSCellStateValue.On : NSCellStateValue.Off;
+            }
+        }
 
-		void FeatureEnabledCheckBoxToggled (object sender, WidgetEventArgs e)
-		{
-			changed = true;
-		}
+        class PackageSourcesDelegate : NSTableViewDelegate
+        {
+            internal const string nameColumn = "myCellIdentifier";
+            internal const string valueColumn = "myValueIdentifier";
 
-		void AddFeatures ()
-		{
-			foreach (FeatureSwitch feature in FeatureSwitchConfigurations.GetFeatures ()) {
-				int row = featuresListStore.AddRow ();
+            public override NSView GetViewForItem(NSTableView tableView, NSTableColumn tableColumn, nint row)
+            {
+                var table = (FeatureSwitchTableView)tableView;
+                if (tableColumn.Identifier == nameColumn)
+                {
+                    var model = table.DataForRow((int)row);
 
-				featuresListStore.SetValues (
-					row,
-					featureNameDataField,
-					feature.Name,
-					featureEnabledDataField,
-					feature.Enabled,
-					featureDataField,
-					feature);
-			}
-		}
+                    var view = tableView.MakeView(tableColumn.Identifier, this) as NSTextField;
+                    if (view == null)
+                    {
+                        view = new NSLabel();
+                       
+                        if (model != null)
+                        {
+                            view.StringValue = model.Name ?? string.Empty;
+                        }
+                    }
+                    return view;
+                }
+                if (tableColumn.Identifier == valueColumn)
+                {
+                    var model = table.DataForRow((int)row);
 
-		void RestartButtonClicked (object sender, EventArgs e)
-		{
-			ApplyChanges ();
+                    var view = tableView.MakeView(tableColumn.Identifier, this) as DataCheckBox;
+                    if (view == null)
+                    {
+                        view = new DataCheckBox();
+                        view.SetButtonType(AppKit.NSButtonType.Switch);
+                        view.Activated += (s,e) =>
+                        {
+                            table.OnItemChecked(model, view.State == NSCellStateValue.On);
+                        };
+                    }
+                  
+                    if (model != null)
+                    {
+                        view.SetModel(model);
+                    }
 
-			IdeApp.Restart (true).Ignore ();
+                    return view;
+                }
 
-			// The following does not work. The dialog is always null.
-			var dialog = (widget?.Toplevel as Gtk.Dialog);
-			dialog?.Respond (Gtk.ResponseType.Ok);
-		}
-	}
+                throw new NotImplementedException(tableColumn.Identifier);
+            }
+
+            public override nfloat GetRowHeight(NSTableView tableView, nint row)
+            {
+                return 21;
+            }
+        }
+
+        public event EventHandler<(FeatureSwitch, bool)> ItemChecked;
+
+        private void OnItemChecked(FeatureSwitch model, bool value)
+            => ItemChecked?.Invoke(this, (model, value));
+
+        class PackageSourcesDataSource : NSTableViewDataSource
+        {
+            internal FeatureSwitch DataForRow(int row)
+            {
+                if (row < 0 && row > source.Data.Count - 1)
+                    return null;
+
+                return source.Data[row];
+            }
+
+            IFeatureSwitchData source;
+            public PackageSourcesDataSource(IFeatureSwitchData source)
+            {
+                this.source = source;
+            }
+
+            public override nint GetRowCount(NSTableView tableView)
+            {
+                return source.Data.Count;
+            }
+        }
+    }
+
+    class FeatureSwitchOptionsWidget : NSStackView, IFeatureSwitchData
+    {
+        public FeatureSwitchOptionsWidget()
+        {
+            TranslatesAutoresizingMaskIntoConstraints = false;
+            Orientation = NSUserInterfaceLayoutOrientation.Vertical;
+            Alignment = NSLayoutAttribute.Leading;
+            Spacing = 10;
+            Distribution = NSStackViewDistribution.Fill;
+
+            var scrollview = new AppKit.NSScrollView()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                DrawsBackground = false,
+                BackgroundColor = NSColor.Clear
+            };
+            AddArrangedSubview(scrollview);
+
+            scrollview.LeadingAnchor.ConstraintEqualToAnchor(this.LeadingAnchor).Active = true;
+            scrollview.TrailingAnchor.ConstraintEqualToAnchor(this.TrailingAnchor).Active = true;
+
+            scrollview.HeightAnchor.ConstraintEqualToConstant(304).Active = true;
+
+            tableView = new FeatureSwitchTableView(this);
+            tableView.ItemChecked += (s,e) => changed = true;
+
+            scrollview.DocumentView = tableView;
+
+            foreach (FeatureSwitch feature in FeatureSwitchConfigurations.GetFeatures())
+            {
+                Data.Add(feature);
+            }
+
+            tableView.ReloadData();
+
+            var someLabel = new NSLabel(GettextCatalog.GetString("Some features may require a restart of {0}", BrandingService.ApplicationName));
+            AddArrangedSubview(someLabel);
+
+            someLabel.LeadingAnchor.ConstraintEqualToAnchor(this.LeadingAnchor).Active = true;
+            someLabel.TrailingAnchor.ConstraintEqualToAnchor(this.TrailingAnchor).Active = true;
+
+            var restartButton = new NSButton() { Title = GettextCatalog.GetString("Restart {0}", BrandingService.ApplicationName) };
+            restartButton.BezelStyle = NSBezelStyle.Rounded;
+            restartButton.Action = new Selector(RestartSelectorName);
+            restartButton.Target = this;
+
+            AddArrangedSubview(restartButton);
+            restartButton.WidthAnchor.ConstraintEqualToConstant (200).Active = true;
+        }
+
+        const string RestartSelectorName = "onRestartClicked:";
+
+        [Export(RestartSelectorName)]
+        private void Restart_Activated(NSObject target)
+        {
+            //reset ide api was hidden?
+        }
+
+        bool changed;
+
+        FeatureSwitchTableView tableView;
+
+        public override void SetFrameSize(CGSize newSize)
+        {
+            base.SetFrameSize(newSize);
+            tableView.SetFrameSize(new CGSize(newSize.Width, tableView.Frame.Height));
+        }
+
+        internal void ApplyChanges()
+        {
+            if (!changed)
+                return;
+
+            FeatureSwitchConfigurations.OnFeaturesChanged();
+        }
+
+        public List<FeatureSwitch> Data { get; } = new List<FeatureSwitch>();
+    }
 }

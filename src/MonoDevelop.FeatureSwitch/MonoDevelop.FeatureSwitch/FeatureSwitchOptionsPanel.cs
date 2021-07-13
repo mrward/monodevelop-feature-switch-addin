@@ -24,24 +24,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using MonoDevelop.Components;
 using MonoDevelop.Ide.Gui.Dialogs;
 
 namespace MonoDevelop.FeatureSwitch
 {
-	partial class FeatureSwitchOptionsPanel : OptionsPanel
-	{
-		public override void ApplyChanges ()
-		{
-			if (!changed)
-				return;
+    partial class FeatureSwitchOptionsPanel : OptionsPanel
+    {
+        FeatureSwitchOptionsWidget widget;
 
-			for (int row = 0; row < featuresListStore.RowCount; ++row) {
-				bool enabled = featuresListStore.GetValue (row, featureEnabledDataField);
-				FeatureSwitch feature = featuresListStore.GetValue (row, featureDataField);
-				feature.Enabled = enabled;
-			}
+        public override Control CreatePanelWidget()
+        {
+            if (widget == null)
+            {
+                widget = new FeatureSwitchOptionsWidget();
+            }
+            return widget;
+        }
 
-			FeatureSwitchConfigurations.OnFeaturesChanged ();
-		}
-	}
+        public override void ApplyChanges()
+        {
+            widget.ApplyChanges();
+        }
+    }
 }
