@@ -48,6 +48,7 @@
     <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchOptionsView.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchDataSource.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchCheckBox.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch\IdeRestarter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\MonoDevelop.FeatureSwitch.addin.xml">

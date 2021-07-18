@@ -102,7 +102,7 @@ namespace MonoDevelop.FeatureSwitch.Gui
 		[Export (RestartSelectorName)]
 		void RestartActivated (NSObject target)
 		{
-
+			IdeRestarter.RestartAsync (true).Ignore ();
 		}
 
 		public override void SetFrameSize (CGSize newSize)
