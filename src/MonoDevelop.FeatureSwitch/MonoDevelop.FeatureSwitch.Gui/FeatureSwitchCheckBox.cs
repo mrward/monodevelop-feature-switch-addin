@@ -37,7 +37,6 @@ namespace MonoDevelop.FeatureSwitch.Gui
 		{
 			SetButtonType (NSButtonType.Switch);
 			TranslatesAutoresizingMaskIntoConstraints = false;
-			Title = string.Empty;
 			Activated += DataCheckBoxActivated;
 		}
 
@@ -51,7 +50,13 @@ namespace MonoDevelop.FeatureSwitch.Gui
 		public void SetModel (FeatureSwitch model)
 		{
 			this.model = model;
-			State = model.Enabled ? NSCellStateValue.On : NSCellStateValue.Off;
+			if (model == null) {
+				State = NSCellStateValue.Off;
+				Title = string.Empty;
+			} else {
+				State = model.Enabled ? NSCellStateValue.On : NSCellStateValue.Off;
+				Title = model.Name;
+			}
 		}
 	}
 }

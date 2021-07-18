@@ -40,13 +40,8 @@ namespace MonoDevelop.FeatureSwitch.Gui
 
 			BackgroundColor = NSColor.Clear;
 
-			var column = new NSTableColumn (FeatureSwitchTableViewDelegate.nameColumn);
+			var column = new NSTableColumn (FeatureSwitchTableViewDelegate.FeatureCheckBoxColumnIdentifier);
 			column.Title = GettextCatalog.GetString ("Feature");
-			column.MinWidth = 300;
-			AddColumn (column);
-
-			column = new NSTableColumn (FeatureSwitchTableViewDelegate.valueColumn);
-			column.Title = GettextCatalog.GetString ("Enabled");
 			AddColumn (column);
 
 			DataSource = new FeatureSwitchDataSource (source);

@@ -24,33 +24,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using AppKit;
 using System;
+using AppKit;
 
 namespace MonoDevelop.FeatureSwitch.Gui
 {
 	class FeatureSwitchTableViewDelegate : NSTableViewDelegate
 	{
-		internal const string nameColumn = "myCellIdentifier";
-		internal const string valueColumn = "myValueIdentifier";
+		internal const string FeatureCheckBoxColumnIdentifier = nameof (FeatureCheckBoxColumnIdentifier);
 
 		public override NSView GetViewForItem (NSTableView tableView, NSTableColumn tableColumn, nint row)
 		{
 			var table = (FeatureSwitchTableView)tableView;
-			if (tableColumn.Identifier == nameColumn) {
-				FeatureSwitch model = table.DataForRow ((int)row);
 
-				var view = tableView.MakeView (tableColumn.Identifier, this) as NSTextField;
-				if (view == null) {
-					view = new NSLabel ();
-
-					if (model != null) {
-						view.StringValue = model.Name ?? string.Empty;
-					}
-				}
-				return view;
-			}
-			if (tableColumn.Identifier == valueColumn) {
+			if (tableColumn.Identifier == FeatureCheckBoxColumnIdentifier) {
 				FeatureSwitch model = table.DataForRow ((int)row);
 
 				var view = tableView.MakeView (tableColumn.Identifier, this) as FeatureSwitchCheckBox;
@@ -62,9 +49,7 @@ namespace MonoDevelop.FeatureSwitch.Gui
 					};
 				}
 
-				if (model != null) {
-					view.SetModel (model);
-				}
+				view.SetModel (model);
 
 				return view;
 			}
