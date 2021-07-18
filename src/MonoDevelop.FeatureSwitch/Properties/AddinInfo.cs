@@ -34,10 +34,10 @@ using Mono.Addins;
 [assembly: AddinName ("Feature Switch")]
 [assembly: AddinDescription ("Allows features to be enabled/disabled in the IDE")]
 
-[assembly: AddinDependency ("Core", "8.5")]
-[assembly: AddinDependency ("Ide", "8.5")]
+[assembly: AddinDependency ("Core", "17.0")]
+[assembly: AddinDependency ("Ide", "17.0")]
 
 // Depend on Xamarin.Ide since this defines the global feature switch controller.
 // This allows us to define it after the global one and change the behaviour in
 // the IDE.
-[assembly: AddinDependency ("Xamarin.Ide", "8.5")]
+[assembly: AddinDependency ("Xamarin.Ide", "17.0")]
