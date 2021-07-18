@@ -1,10 +1,10 @@
 ﻿//
-// FeatureSwitchOptionsPanel.cs
+// FeatureSwitchTableView.cs
 //
 // Author:
-//       Matt Ward <matt.ward@microsoft.com>
+//       jmedrano <josmed@microsoft.com>
 //
-// Copyright (c) 2019 Microsoft Corporation
+// Copyright (c) 2021
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using MonoDevelop.Components;
-using MonoDevelop.FeatureSwitch.Gui;
-using MonoDevelop.Ide.Gui.Dialogs;
+using AppKit;
+using System;
+using MonoDevelop.Core;
 
-namespace MonoDevelop.FeatureSwitch
+namespace MonoDevelop.FeatureSwitch.Gui
 {
-	class FeatureSwitchOptionsPanel : OptionsPanel
+	class FeatureSwitchTableView : NSTableView
 	{
-		FeatureSwitchOptionsView widget;
+		public override bool IsFlipped => true;
 
-		public override Control CreatePanelWidget ()
+		public FeatureSwitchTableView (IFeatureSwitchData source)
 		{
-			if (widget == null) {
-				widget = new FeatureSwitchOptionsView ();
-				widget.AddFeatures (FeatureSwitchConfigurations.GetFeatures ());
-			}
-			return widget;
+			HeaderView = null;
+
+			BackgroundColor = NSColor.Clear;
+
+			var column = new NSTableColumn (FeatureSwitchTableViewDelegate.nameColumn);
+			column.Title = GettextCatalog.GetString ("Feature");
+			column.MinWidth = 300;
+			AddColumn (column);
+
+			column = new NSTableColumn (FeatureSwitchTableViewDelegate.valueColumn);
+			column.Title = GettextCatalog.GetString ("Enabled");
+			AddColumn (column);
+
+			DataSource = new FeatureSwitchDataSource (source);
+			Delegate = new FeatureSwitchTableViewDelegate ();
 		}
 
-		public override void ApplyChanges ()
+		public FeatureSwitch DataForRow (int row)
 		{
-			widget.ApplyChanges ();
+			return ((FeatureSwitchDataSource)DataSource).DataForRow (row);
 		}
 
-		public override void Dispose ()
+		public event EventHandler<(FeatureSwitch, bool)> ItemChecked;
+
+		public void OnItemChecked (FeatureSwitch model, bool value)
 		{
-			if (widget != null) {
-				widget.Dispose ();
-				widget = null;
-			}
-			base.Dispose ();
+			ItemChecked?.Invoke (this, (model, value));
 		}
 	}
 }

@@ -35,15 +35,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AddinInfo.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchOptionsPanel.cs" />
-    <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchOptionsPanel.UI.cs">
-      <DependentUpon>FeatureSwitchOptionsPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchController.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitch.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchConfigurations.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchEnvironmentVariables.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchServiceExtensions.cs" />
     <Compile Include="MonoDevelop.FeatureSwitch\FeatureSwitchStartupHandler.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch.Gui\NSLabel.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch.Gui\IFeatureSwitchData.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchTableView.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchTableViewDelegate.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchOptionsView.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchDataSource.cs" />
+    <Compile Include="MonoDevelop.FeatureSwitch.Gui\FeatureSwitchCheckBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\MonoDevelop.FeatureSwitch.addin.xml">
@@ -52,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MonoDevelop.FeatureSwitch\" />
+    <Folder Include="MonoDevelop.FeatureSwitch.Gui\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

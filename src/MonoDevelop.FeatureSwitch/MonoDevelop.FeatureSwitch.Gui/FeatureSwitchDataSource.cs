@@ -1,10 +1,10 @@
 ﻿//
-// FeatureSwitchOptionsPanel.cs
+// FeatureSwitchDataSource.cs
 //
 // Author:
-//       Matt Ward <matt.ward@microsoft.com>
+//       jmedrano <josmed@microsoft.com>
 //
-// Copyright (c) 2019 Microsoft Corporation
+// Copyright (c) 2021
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using MonoDevelop.Components;
-using MonoDevelop.FeatureSwitch.Gui;
-using MonoDevelop.Ide.Gui.Dialogs;
+using AppKit;
+using System;
 
-namespace MonoDevelop.FeatureSwitch
+namespace MonoDevelop.FeatureSwitch.Gui
 {
-	class FeatureSwitchOptionsPanel : OptionsPanel
+	class FeatureSwitchDataSource : NSTableViewDataSource
 	{
-		FeatureSwitchOptionsView widget;
+		IFeatureSwitchData source;
 
-		public override Control CreatePanelWidget ()
+		internal FeatureSwitch DataForRow (int row)
 		{
-			if (widget == null) {
-				widget = new FeatureSwitchOptionsView ();
-				widget.AddFeatures (FeatureSwitchConfigurations.GetFeatures ());
+			if (row < 0 && row > source.Data.Count - 1) {
+				return null;
 			}
-			return widget;
+			return source.Data[row];
 		}
 
-		public override void ApplyChanges ()
+		public FeatureSwitchDataSource (IFeatureSwitchData source)
 		{
-			widget.ApplyChanges ();
+			this.source = source;
 		}
 
-		public override void Dispose ()
+		public override nint GetRowCount (NSTableView tableView)
 		{
-			if (widget != null) {
-				widget.Dispose ();
-				widget = null;
-			}
-			base.Dispose ();
+			return source.Data.Count;
 		}
 	}
 }

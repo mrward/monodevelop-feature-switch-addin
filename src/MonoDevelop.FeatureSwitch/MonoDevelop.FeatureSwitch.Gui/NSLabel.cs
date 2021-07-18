@@ -1,10 +1,10 @@
 ﻿//
-// FeatureSwitchOptionsPanel.cs
+// NSLabel.cs
 //
 // Author:
-//       Matt Ward <matt.ward@microsoft.com>
+//       jmedrano <josmed@microsoft.com>
 //
-// Copyright (c) 2019 Microsoft Corporation
+// Copyright (c) 2021
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using MonoDevelop.Components;
-using MonoDevelop.FeatureSwitch.Gui;
-using MonoDevelop.Ide.Gui.Dialogs;
+using AppKit;
 
-namespace MonoDevelop.FeatureSwitch
+namespace MonoDevelop.FeatureSwitch.Gui
 {
-	class FeatureSwitchOptionsPanel : OptionsPanel
+	class NSLabel : NSTextField
 	{
-		FeatureSwitchOptionsView widget;
-
-		public override Control CreatePanelWidget ()
+		public NSLabel (string value = null)
 		{
-			if (widget == null) {
-				widget = new FeatureSwitchOptionsView ();
-				widget.AddFeatures (FeatureSwitchConfigurations.GetFeatures ());
+			Editable = false;
+			Bordered = false;
+			Bezeled = false;
+			DrawsBackground = false;
+			Selectable = false;
+			TranslatesAutoresizingMaskIntoConstraints = false;
+
+			if (!string.IsNullOrEmpty (value)) {
+				StringValue = value;
 			}
-			return widget;
-		}
-
-		public override void ApplyChanges ()
-		{
-			widget.ApplyChanges ();
-		}
-
-		public override void Dispose ()
-		{
-			if (widget != null) {
-				widget.Dispose ();
-				widget = null;
-			}
-			base.Dispose ();
 		}
 	}
 }
