@@ -52,7 +52,10 @@ namespace MonoDevelop.FeatureSwitch.Gui
 			var scrollview = new NSScrollView () {
 				TranslatesAutoresizingMaskIntoConstraints = false,
 				DrawsBackground = false,
-				BackgroundColor = NSColor.Clear
+				BackgroundColor = NSColor.Clear,
+				AutohidesScrollers = true,
+				HasVerticalScroller = true,
+				VerticalScroller = new NoBackgroundScroller ()
 			};
 			AddArrangedSubview (scrollview);
 
