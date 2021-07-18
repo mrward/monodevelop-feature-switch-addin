@@ -66,6 +66,13 @@ namespace MonoDevelop.FeatureSwitch.Gui
 
 			scrollview.DocumentView = tableView;
 
+			var separatorRestart = new NSBox ();
+			separatorRestart.BoxType = NSBoxType.NSBoxSeparator;
+			AddArrangedSubview (separatorRestart);
+
+			separatorRestart.LeadingAnchor.ConstraintEqualToAnchor (LeadingAnchor).Active = true;
+			separatorRestart.TrailingAnchor.ConstraintEqualToAnchor (TrailingAnchor).Active = true;
+
 			var restartLabel = new NSLabel ();
 			restartLabel.StringValue = GettextCatalog.GetString ("Some features may require a restart of {0}", BrandingService.ApplicationName);
 			AddArrangedSubview (restartLabel);
