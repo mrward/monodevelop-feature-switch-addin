@@ -48,13 +48,15 @@ namespace MonoDevelop.FeatureSwitch
 			widget.ApplyChanges ();
 		}
 
-		public override void Dispose ()
+		protected override void Dispose (bool disposing)
 		{
-			if (widget != null) {
-				widget.Dispose ();
-				widget = null;
+			if (disposing) {
+				if (widget != null) {
+					widget.Dispose ();
+					widget = null;
+				}
 			}
-			base.Dispose ();
+			base.Dispose (disposing);
 		}
 	}
 }
