@@ -3,7 +3,7 @@ VS_PATH?=/Applications/Visual\ Studio\ \(Preview\).app
 VS_DEBUG_PATH?=../vsmac/main/build/bin/VisualStudio.app
 
 PROJECT_NAME=MonoDevelop.FeatureSwitch
-PROJECT_VERSION=0.3
+PROJECT_VERSION=0.4
 
 all:
 	echo "Building $(PROJECT_NAME)..."
