@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System.Reflection;
-using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 
 // Information about this assembly is defined by the following attributes. 
 // Change them to the values specific to your project.
@@ -37,6 +37,12 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCopyright ("Microsoft Corporation")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
+
+// Need to fix CA1416 build warning.
+// This call site is reachable on all platforms. 'NSLayoutConstraint.Active' is only supported on: 'ios' 10.0 and later,
+// 'maccatalyst' 10.0 and later, 'macOS/OSX' 10.14 and later, 'tvos' 10.0 and later. (CA1416))
+// https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1416
+[assembly: SupportedOSPlatform ("macos11.0")]
 
 // The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
