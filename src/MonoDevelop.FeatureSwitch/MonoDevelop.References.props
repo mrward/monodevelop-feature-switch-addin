@@ -4,6 +4,10 @@
     <MDBinDir>\Applications\Visual Studio %28Preview%29.app\Contents\MonoBundle</MDBinDir>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Xamarin.Mac">
+      <HintPath>$(MDBinDir)\Xamarin.Mac.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.Addins">
       <Private>False</Private>
       <HintPath>$(MDBinDir)\Mono.Addins.dll</HintPath>
