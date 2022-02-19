@@ -33,6 +33,7 @@ namespace MonoDevelop.FeatureSwitch
 {
 	static class FeatureSwitchConfigurations
 	{
+		static bool initialized;
 		static readonly Properties properties;
 		static readonly ConfigurationProperty<Properties> configurations;
 		static readonly Dictionary<string, FeatureSwitch> features =
@@ -51,11 +52,23 @@ namespace MonoDevelop.FeatureSwitch
 		public static void Initialize ()
 		{
 			try {
-				ReadFeatureEnvironmentVariables ();
+				if (initialized) {
+					return;
+				}
 
-				PopulateFeaturesFromFeatureSwitchService ();
-				PopulateFeaturesFromProperties ();
-				OnFeaturesChanged (false);
+				lock (features) {
+					if (initialized) {
+						return;
+					}
+
+					initialized = true;
+
+					ReadFeatureEnvironmentVariables ();
+
+					PopulateFeaturesFromFeatureSwitchService ();
+					PopulateFeaturesFromProperties ();
+					OnFeaturesChanged (false);
+				}
 			} catch (Exception ex) {
 				LoggingService.LogError ("Unable to initialize FeatureSwitchConfigurations", ex);
 			}
@@ -63,6 +76,8 @@ namespace MonoDevelop.FeatureSwitch
 
 		public static IEnumerable<FeatureSwitch> GetFeatures ()
 		{
+			Initialize ();
+
 			lock (features) {
 				var list = features.Values.ToList ();
 				list.Sort ();
@@ -72,6 +87,8 @@ namespace MonoDevelop.FeatureSwitch
 
 		public static FeatureSwitch GetFeature (string name)
 		{
+			Initialize ();
+
 			lock (features) {
 				if (features.TryGetValue (name, out FeatureSwitch feature)) {
 					return feature;
@@ -82,6 +99,8 @@ namespace MonoDevelop.FeatureSwitch
 
 		public static void AddFeature (string name, bool? enabled)
 		{
+			Initialize ();
+
 			lock (features) {
 				features [name] = new FeatureSwitch (name, enabled.GetValueOrDefault ());
 			}
@@ -91,6 +110,8 @@ namespace MonoDevelop.FeatureSwitch
 
 		public static void AddSavedFeature (string name, bool enabled)
 		{
+			Initialize ();
+
 			lock (features) {
 				var feature = new FeatureSwitch (name, enabled);
 				features [name] = feature;
