@@ -26,6 +26,7 @@
 
 using System;
 using AppKit;
+using ObjCRuntime;
 
 namespace MonoDevelop.FeatureSwitch.Gui
 {

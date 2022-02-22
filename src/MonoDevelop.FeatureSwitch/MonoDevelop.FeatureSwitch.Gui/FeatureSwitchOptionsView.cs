@@ -59,10 +59,10 @@ namespace MonoDevelop.FeatureSwitch.Gui
 			};
 			AddArrangedSubview (scrollview);
 
-			scrollview.LeadingAnchor.ConstraintEqualToAnchor (LeadingAnchor).Active = true;
-			scrollview.TrailingAnchor.ConstraintEqualToAnchor (TrailingAnchor).Active = true;
+			scrollview.LeadingAnchor.ConstraintEqualTo (LeadingAnchor).Active = true;
+			scrollview.TrailingAnchor.ConstraintEqualTo (TrailingAnchor).Active = true;
 
-			scrollview.HeightAnchor.ConstraintEqualToConstant (304).Active = true;
+			scrollview.HeightAnchor.ConstraintEqualTo (304).Active = true;
 
 			tableView = new FeatureSwitchTableView (this);
 			tableView.ItemChecked += FeatureSwitchTableViewItemChecked;
@@ -73,15 +73,15 @@ namespace MonoDevelop.FeatureSwitch.Gui
 			separatorRestart.BoxType = NSBoxType.NSBoxSeparator;
 			AddArrangedSubview (separatorRestart);
 
-			separatorRestart.LeadingAnchor.ConstraintEqualToAnchor (LeadingAnchor).Active = true;
-			separatorRestart.TrailingAnchor.ConstraintEqualToAnchor (TrailingAnchor).Active = true;
+			separatorRestart.LeadingAnchor.ConstraintEqualTo (LeadingAnchor).Active = true;
+			separatorRestart.TrailingAnchor.ConstraintEqualTo (TrailingAnchor).Active = true;
 
 			var restartLabel = new NSLabel ();
 			restartLabel.StringValue = GettextCatalog.GetString ("Some features may require a restart of {0}", BrandingService.ApplicationName);
 			AddArrangedSubview (restartLabel);
 
-			restartLabel.LeadingAnchor.ConstraintEqualToAnchor (LeadingAnchor).Active = true;
-			restartLabel.TrailingAnchor.ConstraintEqualToAnchor (TrailingAnchor).Active = true;
+			restartLabel.LeadingAnchor.ConstraintEqualTo (LeadingAnchor).Active = true;
+			restartLabel.TrailingAnchor.ConstraintEqualTo (TrailingAnchor).Active = true;
 
 			if (IdeRestarter.CanRestart ())
 			{
@@ -92,7 +92,7 @@ namespace MonoDevelop.FeatureSwitch.Gui
 				restartButton.Target = this;
 
 				AddArrangedSubview (restartButton);
-				restartButton.WidthAnchor.ConstraintEqualToConstant (200).Active = true;
+				restartButton.WidthAnchor.ConstraintEqualTo (200).Active = true;
 			}
 		}
 
