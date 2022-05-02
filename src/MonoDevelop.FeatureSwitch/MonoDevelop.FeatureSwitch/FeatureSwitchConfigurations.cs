@@ -52,12 +52,9 @@ namespace MonoDevelop.FeatureSwitch
 		public static void Initialize ()
 		{
 			try {
-				if (initialized) {
-					return;
-				}
-
 				lock (features) {
 					if (initialized) {
+						RefreshFeaturesFromFeatureSwitchService ();
 						return;
 					}
 
@@ -148,6 +145,27 @@ namespace MonoDevelop.FeatureSwitch
 			lock (features) {
 				foreach (FeatureSwitch feature in FeatureSwitchServiceExtensions.DescribeFeatures ()) {
 					features [feature.Name] = feature;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Handle feature switches that have been added after initializing.
+		/// </summary>
+		static void RefreshFeaturesFromFeatureSwitchService ()
+		{
+			lock (features) {
+				bool changed = false;
+
+				foreach (FeatureSwitch feature in FeatureSwitchServiceExtensions.DescribeFeatures ()) {
+					if (!features.ContainsKey (feature.Name)) {
+						features[feature.Name] = feature;
+						changed = true;
+					}
+				}
+
+				if (changed) {
+					OnFeaturesChanged (updateProperties: false);
 				}
 			}
 		}
