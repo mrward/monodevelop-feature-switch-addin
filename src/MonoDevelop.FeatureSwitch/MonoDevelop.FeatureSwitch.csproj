@@ -4,7 +4,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\..\bin</OutputPath>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-macos</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\MonoDevelop.FeatureSwitch.addin.xml">

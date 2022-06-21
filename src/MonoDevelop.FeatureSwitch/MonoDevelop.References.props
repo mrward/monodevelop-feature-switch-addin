@@ -1,13 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project>
   <PropertyGroup>
     <MDBinDir>\Applications\Visual Studio %28Preview%29.app\Contents\MonoBundle</MDBinDir>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Xamarin.Mac">
-      <HintPath>/usr/local/share/dotnet/packs/Microsoft.macOS.Ref/12.1.301-preview.13.10/ref/net6.0/Xamarin.Mac.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Mono.Addins">
       <Private>False</Private>
       <HintPath>$(MDBinDir)\Mono.Addins.dll</HintPath>
