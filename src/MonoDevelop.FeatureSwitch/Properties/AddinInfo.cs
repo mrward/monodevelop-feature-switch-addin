@@ -28,7 +28,7 @@ using Mono.Addins;
 [assembly: Addin (
 	"FeatureSwitch",
 	Namespace = "MonoDevelop",
-	Version = "0.6",
+	Version = "0.7",
 	Category = "IDE extensions")]
 
 [assembly: AddinName ("Feature Switch")]
