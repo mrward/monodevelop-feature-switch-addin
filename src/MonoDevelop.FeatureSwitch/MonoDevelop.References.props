@@ -3,6 +3,13 @@
     <MDBinDir>\Applications\Visual Studio %28Preview%29.app\Contents\MonoBundle</MDBinDir>
   </PropertyGroup>
   <ItemGroup>
+   <PackageReference Include="System.Runtime.InteropServices.NFloat.Internal" Version="6.0.1" GeneratePathProperty="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.macOS">
+      <HintPath>$(MDBinDir)\Microsoft.macOS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.Addins">
       <Private>False</Private>
       <HintPath>$(MDBinDir)\Mono.Addins.dll</HintPath>

@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Runtime.InteropServices;
 using AppKit;
 using ObjCRuntime;
 
