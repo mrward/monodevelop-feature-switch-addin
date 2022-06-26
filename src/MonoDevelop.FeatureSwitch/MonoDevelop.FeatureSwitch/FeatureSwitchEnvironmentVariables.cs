@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MonoDevelop.Core;
+using MonoDevelop.Core.PooledObjects;
 
 namespace MonoDevelop.FeatureSwitch
 {
@@ -72,7 +73,7 @@ namespace MonoDevelop.FeatureSwitch
 			string environmentVariableName,
 			IEnumerable<FeatureSwitch> features)
 		{
-			var builder = StringBuilderCache.Allocate ();
+			var builder = PooledStringBuilder.GetInstance ();
 			foreach (FeatureSwitch feature in features) {
 				if (builder.Length > 0) {
 					builder.Append (';');
@@ -80,7 +81,7 @@ namespace MonoDevelop.FeatureSwitch
 				builder.Append (feature.Name);
 			}
 
-			string value = StringBuilderCache.ReturnAndFree (builder);
+			string value = builder.ToStringAndFree ();
 			Environment.SetEnvironmentVariable (environmentVariableName, value);
 		}
 	}
